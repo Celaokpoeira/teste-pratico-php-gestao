@@ -49,6 +49,7 @@ include 'layout_header.php';
 </div>
 
 <h3>Lista de Fornecedores</h3>
+input type="text" id="busca-tabela" placeholder="🔍 Buscar fornecedor por nome, CNPJ ou ID..." style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px;">
 <table>
     <thead>
         <tr>

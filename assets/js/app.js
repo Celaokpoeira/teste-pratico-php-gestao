@@ -121,4 +121,19 @@ $(document).ready(function() {
 
     // Inicia carregando os dados ao abrir a página
     carregarVinculos();
+
+    // ==========================================
+    // DESAFIO DE CRIATIVIDADE: FILTRO DE BUSCA (UX)
+    // ==========================================
+    $('#busca-tabela').on('keyup', function() {
+        // Pega o valor digitado e transforma em letras minúsculas
+        var valorBusca = $(this).val().toLowerCase();
+        
+        // Filtra as linhas do corpo da tabela (tbody tr)
+        $('table tbody tr').filter(function() {
+            // Alterna a exibição da linha se o texto dela bater com a busca
+            $(this).toggle($(this).text().toLowerCase().indexOf(valorBusca) > -1);
+        });
+    });
+
 });
