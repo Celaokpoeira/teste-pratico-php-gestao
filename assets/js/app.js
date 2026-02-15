@@ -1,34 +1,41 @@
 $(document).ready(function() {
     
+    // Verifica se estamos na tela de vínculos pegando o ID oculto
     const produtoIdAtual = $('#produto_id_atual').val();
 
-    // Função de Feedback Visual
+    // Função de Feedback Visual (Toast/Mensagem)
     function mostrarFeedback(mensagem, tipo) {
         let box = $('#msg-feedback');
         box.text(mensagem).removeClass('erro sucesso');
         
-        if(tipo === 'erro') box.addClass('erro').css({color: 'red', fontWeight: 'bold'});
-        else box.addClass('sucesso').css({color: 'green', fontWeight: 'bold'});
+        if(tipo === 'erro') {
+            box.css({backgroundColor: '#f8d7da', color: '#721c24', border: '1px solid #f5c6cb'}).fadeIn();
+        } else {
+            box.css({backgroundColor: '#d4edda', color: '#155724', border: '1px solid #c3e6cb'}).fadeIn();
+        }
         
-        box.fadeIn().delay(3000).fadeOut();
+        // Some depois de 3 segundos
+        setTimeout(function() { box.fadeOut(); }, 3000);
     }
 
-    // 1. Carregar lista via AJAX
+    // 1. Carregar lista de fornecedores vinculados via AJAX
     function carregarVinculos() {
+        if(!produtoIdAtual) return; // Só roda se estiver na tela de vínculo
+
         $.ajax({
-            url: 'controllers/VinculoController.php',
+            url: '../controllers/VinculoController.php',
             type: 'GET',
             data: { action: 'listar', produto_id: produtoIdAtual },
             dataType: 'json',
             success: function(res) {
-                let tbody = $('#tabela-vinculos tbody');
-                tbody.empty(); // Limpa a tabela antes de popular
+                let tbody = $('#tabela-vinculos-body');
+                tbody.empty(); // Limpa a tabela
 
                 if(res.sucesso && res.dados.length > 0) {
                     res.dados.forEach(function(fornecedor) {
                         tbody.append(`
                             <tr id="linha-${fornecedor.id}">
-                                <td><input type="checkbox" class="check-fornecedor" value="${fornecedor.id}"></td>
+                                <td style="text-align: center;"><input type="checkbox" class="check-fornecedor" value="${fornecedor.id}"></td>
                                 <td>${fornecedor.id}</td>
                                 <td>${fornecedor.nome}</td>
                                 <td>${fornecedor.cnpj}</td>
@@ -36,7 +43,7 @@ $(document).ready(function() {
                         `);
                     });
                 } else {
-                    tbody.append('<tr><td colspan="4">Nenhum fornecedor vinculado.</td></tr>');
+                    tbody.append('<tr><td colspan="4" style="text-align: center;">Nenhum fornecedor vinculado a este produto.</td></tr>');
                 }
             }
         });
@@ -52,7 +59,7 @@ $(document).ready(function() {
         }
 
         $.ajax({
-            url: 'controllers/VinculoController.php',
+            url: '../controllers/VinculoController.php',
             type: 'POST',
             data: { 
                 action: 'vincular', 
@@ -64,7 +71,7 @@ $(document).ready(function() {
                 if(res.sucesso) {
                     mostrarFeedback(res.mensagem, 'sucesso');
                     $('#novo_fornecedor_id').val(''); // Limpa o input
-                    carregarVinculos(); // Recarrega a tabela
+                    carregarVinculos(); // Recarrega a tabela via AJAX
                 } else {
                     mostrarFeedback(res.mensagem, 'erro');
                 }
@@ -74,7 +81,6 @@ $(document).ready(function() {
 
     // 3. Remover em Massa
     $('#btn-remover-massa').on('click', function() {
-        // Pega todos os checkboxes que estão marcados
         let selecionados = [];
         $('.check-fornecedor:checked').each(function() {
             selecionados.push($(this).val());
@@ -87,18 +93,18 @@ $(document).ready(function() {
 
         if(confirm('Tem certeza que deseja remover os vínculos selecionados?')) {
             $.ajax({
-                url: 'controllers/VinculoController.php',
+                url: '../controllers/VinculoController.php',
                 type: 'POST',
                 data: {
                     action: 'remover_massa',
                     produto_id: produtoIdAtual,
-                    fornecedores_ids: selecionados // Envia como array
+                    fornecedores_ids: selecionados
                 },
                 dataType: 'json',
                 success: function(res) {
                     if(res.sucesso) {
                         mostrarFeedback(res.mensagem, 'sucesso');
-                        carregarVinculos();
+                        carregarVinculos(); // Atualiza a tabela na hora
                         $('#check-todos').prop('checked', false);
                     } else {
                         mostrarFeedback(res.mensagem, 'erro');
@@ -108,7 +114,7 @@ $(document).ready(function() {
         }
     });
 
-    // Função utilitária: Selecionar/Deselecionar todos os checkboxes
+    // 4. Selecionar/Deselecionar todos os checkboxes
     $('#check-todos').on('click', function() {
         $('.check-fornecedor').prop('checked', $(this).prop('checked'));
     });
