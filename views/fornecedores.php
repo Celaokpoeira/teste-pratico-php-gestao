@@ -14,6 +14,8 @@ include 'layout_header.php';
 
 <?php if(isset($_GET['sucesso'])): ?>
     <div style="background: #d4edda; color: #155724; padding: 10px; margin-bottom: 15px;">Operação realizada com sucesso!</div>
+<?php elseif(isset($_GET['erro'])): ?>
+    <div style="background: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 15px;">Ocorreu um erro na operação.</div>
 <?php endif; ?>
 
 <div style="background: #f8f9fa; padding: 15px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 20px;">
@@ -54,7 +56,7 @@ include 'layout_header.php';
             <th>Nome</th>
             <th>CNPJ</th>
             <th>Status</th>
-        </tr>
+            <th>Ações</th> </tr>
     </thead>
     <tbody>
         <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
@@ -63,6 +65,9 @@ include 'layout_header.php';
                 <td><?php echo htmlspecialchars($row['nome']); ?></td>
                 <td><?php echo htmlspecialchars($row['cnpj']); ?></td>
                 <td><?php echo $row['status']; ?></td>
+                <td>
+                    <a href="editar_fornecedor.php?id=<?php echo $row['id']; ?>" class="btn" style="text-decoration: none; font-size: 14px; background-color: #007bff;">Editar</a>
+                </td>
             </tr>
         <?php endwhile; ?>
     </tbody>

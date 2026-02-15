@@ -30,5 +30,34 @@ class Fornecedor {
         
         return $stmt->execute();
     }
+
+    // Busca um fornecedor específico para preencher o formulário de edição
+    public function buscarPorId($id) {
+        $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":id", $id);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // Atualiza os dados no banco
+    public function editar($id, $nome, $cnpj, $email, $telefone, $status) {
+        $query = "UPDATE " . $this->table_name . " 
+                  SET nome = :nome, cnpj = :cnpj, email = :email, telefone = :telefone, status = :status 
+                  WHERE id = :id";
+        
+        $stmt = $this->conn->prepare($query);
+        
+        $nome = htmlspecialchars(strip_tags($nome));
+        
+        $stmt->bindParam(":nome", $nome);
+        $stmt->bindParam(":cnpj", $cnpj);
+        $stmt->bindParam(":email", $email);
+        $stmt->bindParam(":telefone", $telefone);
+        $stmt->bindParam(":status", $status);
+        $stmt->bindParam(":id", $id);
+        
+        return $stmt->execute();
+    }
 }
 ?>
